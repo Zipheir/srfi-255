@@ -242,30 +242,31 @@
             restartable-proc))))))
 
   (define-syntax define-restartable
-    (syntax-rules ()
-      ((_ ((x) . rest) _ ...)
-       (syntax-violation 'restartable
-                         "invalid syntax"
-                         (define ((x) . rest))))
-      ((_ (name arg ...) body1 body2 ...)
-       (define name
-         (let ((proc (lambda (arg ...) body1 body2 ...)))
-           (lambda (arg ...)
-             (restarter-guard name
-                              (((use-arguments arg ...)
-                                "Apply procedure to new arguments."
-                                (name arg ...)))
-               (proc arg ...))))))
-      ((_ (name . args) body1 body2 ...)
-       (define name
-         (let ((proc (lambda args body1 body2 ...)))
-           (lambda args
-             (restarter-guard name
-                              (((use-arguments . args)
-                                "Apply procedure to new arguments."
-                                (apply name args)))
-               (apply proc args))))))
-      ((_ name expr)
-       (define name (restartable name expr)))))
+    (lambda (syn)
+      (syntax-case syn ()
+        ((_ (name . formals) body ...)
+         (identifier? #'name)
+         (let ((make-app
+                (lambda (s)
+                  (with-syntax ((proc s))
+                    (syntax-case #'formals ()
+                      (var (identifier? #'var) #'(apply proc var))
+                      ((x ...) #'(proc x ...))
+                      ((x1 ... xK . rest)
+                       #'(apply proc x1 ... xK rest)))))))
+           #`(define name
+               (let ((proc (lambda formals body ...)))
+                 #,(with-syntax ((app1 (make-app #'name))
+                                 (app2 (make-app #'proc)))
+                     (syntax
+                      (lambda formals
+                        (restarter-guard
+                          name
+                          (((use-arguments . formals)
+                            "Apply procedure to new arguments."
+                            app1))
+                          app2))))))))
+        ((_ name expr)
+         (syntax (define name (restartable name expr)))))))
 
   )
