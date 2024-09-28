@@ -209,8 +209,7 @@
                       ((x ...) #'(proc x ...))
                       ((x1 ... xK . rest)
                        #'(apply proc x1 ... xK rest)))))))
-           (quasisyntax
-            (letrec*
+           #`(letrec*
              ((proc (lambda formals body ...))
               (restartable-proc
                (lambda formals
