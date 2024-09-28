@@ -217,7 +217,7 @@
                                   (app2 (make-app #'proc)))
                       #'(restarter-guard
                          who
-                         (con ((use-arguments . formals)
+                         (((use-arguments . formals)
                            "Apply procedure to new arguments."
                            app1))
                           app2)))))
