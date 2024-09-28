@@ -210,18 +210,18 @@
                       ((x1 ... xK . rest)
                        #'(apply proc x1 ... xK rest)))))))
            #`(letrec*
-             ((proc (lambda formals body ...))
-              (restartable-proc
-               (lambda formals
-                 #,(with-syntax ((app1 (make-app #'restartable-proc))
-                                 (app2 (make-app #'proc)))
-                     #'(restarter-guard who
-                                        (con
-                                         ((use-arguments . formals)
-                                          "Apply procedure to new arguments."
-                                          app1))
-                         app2)))))
-              restartable-proc))))
+              ((proc (lambda formals body ...))
+               (restartable-proc
+                (lambda formals
+                  #,(with-syntax ((app1 (make-app #'restartable-proc))
+                                  (app2 (make-app #'proc)))
+                      #'(restarter-guard
+                         who
+                         (con ((use-arguments . formals)
+                           "Apply procedure to new arguments."
+                           app1))
+                          app2)))))
+               restartable-proc))))
         ((_ who expr)
          (syntax
           (letrec*
