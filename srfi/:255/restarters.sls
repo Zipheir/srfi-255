@@ -196,23 +196,50 @@
                               (apply values vals))))))))))))))))))
 
   (define-syntax restartable
-    (syntax-rules ()
-     ((_ who expr)
-       (letrec*
-        ((proc expr)
-         (junk (if (not (procedure? proc))
-                   (assertion-violation
-                    'restartable
-                    "expression must evaluate to a procedure"
-                    'expr)))
-         (restartable-proc
-          (lambda args
-            (restarter-guard who
-                             (((use-arguments . args)
-                               "Apply procedure to new arguments."
-                               (apply restartable-proc args)))
-              (apply proc args)))))
-         restartable-proc))))
+    (lambda (syn)
+      (syntax-case syn (lambda)
+        ;; This should be a common special case in which we can
+        ;; easily retrieve the formals.
+        ((_ who (lambda formals body ...))
+         (let ((make-app
+                (lambda (s)
+                  (with-syntax ((proc s))
+                    (syntax-case #'formals ()
+                      (var (identifier? #'var) #'(apply proc var))
+                      ((x ...) #'(proc x ...))
+                      ((x1 ... xK . rest)
+                       #'(apply proc x1 ... xK rest)))))))
+           (quasisyntax
+            (letrec*
+             ((proc (lambda formals body ...))
+              (restartable-proc
+               (lambda formals
+                 #,(with-syntax ((app1 (make-app #'restartable-proc))
+                                 (app2 (make-app #'proc)))
+                     #'(restarter-guard who
+                                        (con
+                                         ((use-arguments . formals)
+                                          "Apply procedure to new arguments."
+                                          app1))
+                         app2)))))
+              restartable-proc))))
+        ((_ who expr)
+         (syntax
+          (letrec*
+           ((proc expr)
+            (junk (if (not (procedure? proc))
+                      (assertion-violation
+                       'restartable
+                       "expression must evaluate to a procedure"
+                       'expr)))
+            (restartable-proc
+             (lambda args
+               (restarter-guard who
+                                (((use-arguments . args)
+                                  "Apply procedure to new arguments."
+                                  (apply restartable-proc args)))
+                 (apply proc args)))))
+            restartable-proc))))))
 
   (define-syntax define-restartable
     (syntax-rules ()
