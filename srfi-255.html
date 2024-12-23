@@ -43,18 +43,14 @@
   <body>
     <h1><a href="https://srfi.schemers.org/"><img class="srfi-logo" src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI surfboard logo" /></a>255: Restarting conditions</h1>
 
-<p>Wolfgang Corcoran-Mathe</p>
+<p>by Wolfgang Corcoran-Mathe</p>
 
 <h2 id="status">Status</h2>
 
-    <p>This SRFI is currently in <em>draft</em> status.  Here is <a href="https://srfi.schemers.org/srfi-process.html">an explanation</a> of each status that a SRFI can hold.  To provide input on this SRFI, please send email to <code><a href="mailto:srfi+minus+255+at+srfi+dotschemers+dot+org">srfi-255@<span class="antispam">nospam</span>srfi.schemers.org</a></code>.  To subscribe to the list, follow <a href="https://srfi.schemers.org/srfi-list-subscribe.html">these instructions</a>.  You can access previous messages via the mailing list <a href="https://srfi-email.schemers.org/srfi-255/">archive</a>.</p>
+    <p>This SRFI is currently in <em>final</em> status.  Here is <a href="https://srfi.schemers.org/srfi-process.html">an explanation</a> of each status that a SRFI can hold.  To provide input on this SRFI, please send email to <code><a href="mailto:srfi+minus+255+at+srfi+dotschemers+dot+org">srfi-255@<span class="antispam">nospam</span>srfi.schemers.org</a></code>.  To subscribe to the list, follow <a href="https://srfi.schemers.org/srfi-list-subscribe.html">these instructions</a>.  You can access previous messages via the mailing list <a href="https://srfi-email.schemers.org/srfi-255/">archive</a>.</p>
     <ul>
       <li>Received: 2024-09-13
         <p>This SRFI was forked from SRFI 249 on that date.</p></li>
-      <li>60-day deadline: 2024-11-12</li>
-      <li>Wolfgang's <a href="https://github.com/Zipheir/srfi-255">personal
-           Git repo for this SRFI</a> for reference while the SRFI is in
-           <em>draft</em> status (<a href="https://htmlpreview.github.io/?https://github.com/Zipheir/srfi-255/blob/master/srfi-255.html">preview</a>)</li>
       <li>Draft #1 published: 2024-09-13</li>
       <li>Draft #2 published: 2024-09-17</li>
       <li>Draft #3 published: 2024-09-24</li>
@@ -64,6 +60,7 @@
       <li>Draft #7 published: 2024-11-20</li>
       <li>Draft #8 published: 2024-12-02</li>
       <li>Draft #9 published: 2024-12-22</li>
+      <li>Finalized: 2024-12-22</li>
     </ul>
 
 <h2 id="table-of-contents">Table of Contents</h2>
@@ -141,16 +138,14 @@ signaler and handler are two different parts of a system, between which
 there is a barrier of abstraction. In order to recover gracefully and
 flexibly from exceptional situations, however, the signaler can provide
 multiple ways by which the handler can restart the computation, some of
-which may require extra input. Often, the decision of which method of
-recovery to choose is left up to a human user, who may be prompted for
+which may require extra input. Often, the choice of method of
+recovery is left up to a human user, who may be prompted for
 the input needed to recover. This SRFI proposes a mechanism
-called <dfn>restarters</dfn> which uses a new type of condition object
+called <dfn>restarters</dfn>, which uses a new type of condition object
 and an associated exception handler to encapsulate the information
 necessary to restart a computation. We also
 describe the behavior and interface of <dfn>interactor</dfn> procedures,
 which implement interactive restarts.</p>
-
-<h2 id="issues">Issues</h2>
 
 <h2 id="rationale">Rationale</h2>
 
